@@ -15,6 +15,7 @@ main.o: main.s
 
 main: main.o
 	ld65 -o $(OUT_FILE) $(LD_FLAGS) main.o c64.lib
+	@stat -c "%s bytes" $(OUT_FILE)
 
 run:
 	vice-jz.x64 -autostart $(OUT_FILE)

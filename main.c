@@ -7,6 +7,8 @@
 // convert direction into change in y
 #define DIR2DY(dir) (dir&1 ? 0 : (dir==0 ? -1 : 1))
 
+#define BG_CHAR 0x5e
+
 int DIR2OPPOSITE[] = {2,3,0,1};
 
 void printChar(int x,int y, char c) {
@@ -29,13 +31,14 @@ void printDecimal(int x,int y,int n, int digits) {
 		n/=10;
 	}
 }
-void clearScreen() {
+void fillScreen(char c) {
 	int n=0x400;
 	while (n<0x400+40*25) {
-		POKE(n,' ');
+		POKE(n,c);
 		++n;
 	}
 }
+#define clearScreen() fillScreen(' ')
 
 void wait(int n) {
 	while (n) --n;
@@ -81,7 +84,7 @@ void updatePlayer(Player* p) {
 	p->x += DIR2DX(p->d);
 	p->y += DIR2DY(p->d);
 	c = PEEK(0x400 + p->x + p->y*40); // test screen for what character is there
-	if (c != ' ') { // if the next position isnt blank, the player loses
+	if (c != BG_CHAR) { // if the next position isnt blank, the player loses
 		gameState=p->id ? 1 : 2;
 		return;
 	}
@@ -96,68 +99,91 @@ void getKey() {
 Player p1;
 Player p2;
 
-int main() {
-	int frame;
+void resetGame() {
 	p1.id=0;
 	p1.x=4;
 	p1.y=4;
 	p1.d=2; // down
-	p1.c='1';
+	p1.c=0xa0;
 
 	p2.id=1;
 	p2.x=40-4;
 	p2.y=25-4;
 	p2.d=0; // up
-	p2.c='2';
-	clearScreen();
+	p2.c=0x20;
+	fillScreen(BG_CHAR);
+}
+
+void gameTick() {
+	getKey();
+	while (key) { // repeat until system queue is empty
+		switch (key) {
+			case 'w':
+				playerAddInput(&p1,0);
+				break;
+			case 'd':
+				playerAddInput(&p1,1);
+				break;
+			case 's':
+				playerAddInput(&p1,2);
+				break;
+			case 'a':
+				playerAddInput(&p1,3);
+				break;
+			case 'i':
+				playerAddInput(&p2,0);
+				break;
+			case 'l':
+				playerAddInput(&p2,1);
+				break;
+			case 'k':
+				playerAddInput(&p2,2);
+				break;
+			case 'j':
+				playerAddInput(&p2,3);
+				break;
+		}
+		getKey();
+	}
+	
+	updatePlayer(&p1);
+	updatePlayer(&p2);
+
+	// printBinary(0,0,p1.inputSize,8);
+	// printBinary(0,1,p2.inputSize,8);
+	// printChar(0,2,p1.test);
+	++gameTime;
+}
+
+void onLose() {
+	fillScreen(' ');
+	printChar(0,0,'l');
+	printChar(0,1,gameState == 1 ? '1' : '2');
+	printBinary(0,2,gameTime,8);
+
+	while (1) {
+		getKey();
+		if (key==' ') { // wait for space key
+			break;
+		}
+	}
+	resetGame();
+	gameState=0;
+}
+
+int main() {
+	int frame;
+	resetGame();
 
 	while (1) {
 		wait(3000);
 		// keyboard input
-		getKey();
-		while (key) { // repeat until system queue is empty
-			switch (key) {
-				case 'w':
-					playerAddInput(&p1,0);
-					break;
-				case 'd':
-					playerAddInput(&p1,1);
-					break;
-				case 's':
-					playerAddInput(&p1,2);
-					break;
-				case 'a':
-					playerAddInput(&p1,3);
-					break;
-				case 'i':
-					playerAddInput(&p2,0);
-					break;
-				case 'l':
-					playerAddInput(&p2,1);
-					break;
-				case 'k':
-					playerAddInput(&p2,2);
-					break;
-				case 'j':
-					playerAddInput(&p2,3);
-					break;
-			}
-			getKey();
-		}
+		
 		
 		if (gameState == 0) {
-			updatePlayer(&p1);
-			updatePlayer(&p2);
-
-			printBinary(0,0,p1.inputSize,8);
-			printBinary(0,1,p2.inputSize,8);
-			// printChar(0,2,p1.test);
-			++gameTime;
+			gameTick();
 		} else {
-			clearScreen();
-			printChar(0,0,'l');
-			printChar(0,1,gameState == 1 ? '1' : '2');
-			printBinary(0,2,gameTime,8);
+			onLose();
 		}
 
 		++frame;

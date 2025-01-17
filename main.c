@@ -11,7 +11,7 @@ int DIR2OPPOSITE[] = {2,3,0,1};
 
 void printChar(int x,int y, char c) {
 	int addr = 0x400 + x + y * 40;
-	poke(addr,c);
+	POKE(addr,c);
 }
 
 void printBinary(int x,int y,int n,int bits) {

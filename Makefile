@@ -18,7 +18,7 @@ main: main.o
 	@stat -c "%s bytes" $(OUT_FILE)
 
 qr.png: $(OUT_FILE)
-	qrencode -o qr.png -r $(OUT_FILE)
+	qrencode -o qr.png -r $(OUT_FILE) -8
 
 run:
 	vice-jz.x64 -autostart $(OUT_FILE)

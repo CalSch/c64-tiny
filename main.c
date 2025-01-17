@@ -7,6 +7,7 @@
 // convert direction into change in y
 #define DIR2DY(dir) (dir&1 ? 0 : (dir==0 ? -1 : 1))
 
+int DIR2OPPOSITE[] = {2,3,0,1};
 
 void printChar(int x,int y, char c) {
 	int addr = 0x400 + x + y * 40;
@@ -32,9 +33,11 @@ void wait(int n) {
 	while (n) --n;
 }
 
+
 int key;
 int gameState=0; // 0=playing, 1=player 1 won, 2=player 2 won
 int gameTime=0;
+
 
 typedef struct Player {
 	int id;
@@ -43,15 +46,30 @@ typedef struct Player {
 	int d; // direction, 0=up, 1=right, 2=down, 3=left
 	char c; // player's onscreen character
 	int test; // unused maybe (for testing)
+	char input[10]; // input queue
+	int inputSize; // current input queue size
 } Player;
 
+void playerAddInput(Player* p, int d) {
+	p->input[p->inputSize] = d;
+	++p->inputSize;
+}
+void playerProcessInput(Player* p) {
+	int d;
+	int i=0;
+	if (p->inputSize == 0) return;
+	d=p->input[p->inputSize-1]; // get direction
+	--p->inputSize;
+	// now move queue back
+	for (i=0;i<p->inputSize;i++) {
+		p->input[i]=p->input[i+1];
+	}
+
+	p->d = d; // set player direction
+}
 void updatePlayer(Player* p) {
 	char c;
-	//  check key     p2    p1      don't switch to an opposite direction
-	if (key==(p->id ? 'i' : 'w') && p->d!=2) p->d = 0;
-	if (key==(p->id ? 'l' : 'd') && p->d!=3) p->d = 1;
-	if (key==(p->id ? 'k' : 's') && p->d!=0) p->d = 2;
-	if (key==(p->id ? 'j' : 'a') && p->d!=1) p->d = 3;
+	playerProcessInput(p);
 	p->x += DIR2DX(p->d);
 	p->y += DIR2DY(p->d);
 	c = PEEK(0x400 + p->x + p->y*40); // test screen for what character is there
@@ -60,6 +78,11 @@ void updatePlayer(Player* p) {
 		return;
 	}
 	printChar(p->x,p->y,p->c); // draw player
+}
+
+void getKey() {
+	__asm__("jsr $ffe4"); // run a kernal routine to take a key off of the system queue (not the player queue), the key is stored in A
+	__asm__("sta %v",key); // load A (the key) into `key`
 }
 
 Player p1;
@@ -83,15 +106,43 @@ int main() {
 	while (1) {
 		wait(3000);
 		// keyboard input
-		__asm__("jsr $ffe4"); // run a kernal routine to get what key was pressed, the key is stored in A
-		__asm__("sta %v",key); // load A (the key) into `key`
+		getKey();
+		while (key) { // repeat until system queue is empty
+			switch (key) {
+				case 'w':
+					playerAddInput(&p1,0);
+					break;
+				case 'd':
+					playerAddInput(&p1,1);
+					break;
+				case 's':
+					playerAddInput(&p1,2);
+					break;
+				case 'a':
+					playerAddInput(&p1,3);
+					break;
+				case 'i':
+					playerAddInput(&p2,0);
+					break;
+				case 'l':
+					playerAddInput(&p2,1);
+					break;
+				case 'k':
+					playerAddInput(&p2,2);
+					break;
+				case 'j':
+					playerAddInput(&p2,3);
+					break;
+			}
+			getKey();
+		}
 		
 		if (gameState == 0) {
 			updatePlayer(&p1);
 			updatePlayer(&p2);
 
-			// printBinary(0,0,p1.x,8);
-			// printBinary(0,1,p1.y,8);
+			printBinary(0,0,p1.inputSize,8);
+			printBinary(0,1,p2.inputSize,8);
 			// printChar(0,2,p1.test);
 			++gameTime;
 		} else {

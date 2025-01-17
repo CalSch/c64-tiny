@@ -11,7 +11,7 @@ int DIR2OPPOSITE[] = {2,3,0,1};
 
 void printChar(int x,int y, char c) {
 	int addr = 0x400 + x + y * 40;
-	*(unsigned char*) addr = c;
+	poke(addr,c);
 }
 
 void printBinary(int x,int y,int n,int bits) {
@@ -19,6 +19,14 @@ void printBinary(int x,int y,int n,int bits) {
 	for (i=0;i<bits;++i) {
 		int value = (n>>i)&1;
 		printChar(x-i+bits-1,y,value?'1':'0');
+	}
+}
+void printDecimal(int x,int y,int n, int digits) {
+	int i;
+	for (i=0;i<digits;++i) {
+		int value = n%10;
+		printChar(x-i+digits-1,y,'0'+value);
+		n/=10;
 	}
 }
 void clearScreen() {

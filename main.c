@@ -7,7 +7,7 @@
 // convert direction into change in y
 #define DIR2DY(dir) (dir&1 ? 0 : (dir==0 ? -1 : 1))
 
-#define BG_CHAR 0x5e
+#define BG_CHAR 0xe9
 
 int DIR2OPPOSITE[] = {2,3,0,1};
 
@@ -31,6 +31,13 @@ void printDecimal(int x,int y,int n, int digits) {
 		n/=10;
 	}
 }
+void printString(char* str,int x, int y) {
+	int i=0;
+	while (str[i] != 0) {
+		printChar(x+i,y,str[i]);
+		++i;
+	}
+}
 void fillScreen(char c) {
 	int n=0x400;
 	while (n<0x400+40*25) {
@@ -46,7 +53,7 @@ void wait(int n) {
 
 
 int key;
-int gameState=0; // 0=playing, 1=player 1 won, 2=player 2 won
+int gameState=3; // 0=playing, 1=player 1 won, 2=player 2 won, 3=main menu
 int gameTime=0;
 
 
@@ -114,6 +121,18 @@ void resetGame() {
 	fillScreen(BG_CHAR);
 }
 
+void onMainMenu() {
+	clearScreen();
+	printString("tron!",1,1);
+	printString("press space to start",1,3);
+	while (1) {
+		getKey();
+		if (key==' ') break;
+	}
+	gameState = 0;
+	resetGame();
+}
+
 void gameTick() {
 	getKey();
 	while (key) { // repeat until system queue is empty
@@ -157,9 +176,11 @@ void gameTick() {
 
 void onLose() {
 	fillScreen(' ');
-	printChar(0,0,'l');
-	printChar(0,1,gameState == 1 ? '1' : '2');
-	printBinary(0,2,gameTime,8);
+	printString("game over!",1,1);
+	printString("player # won!",1,3);
+	printChar(8,3,gameState == 1 ? '1' : '2');
+
+	printString("press space to play again",1,6);
 
 	while (1) {
 		getKey();
@@ -179,10 +200,11 @@ int main() {
 		wait(3000);
 		// keyboard input
 		
-		
-		if (gameState == 0) {
+		if (gameState == 3) {
+			onMainMenu();
+		} else if (gameState == 0) {
 			gameTick();
-		} else {
+		} else if (gameState==1 || gameState == 2) {
 			onLose();
 		}
 

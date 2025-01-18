@@ -1,9 +1,13 @@
 # c64-tiny (Tiny Tron!)
 This is Tron for the Commodore 64 made for the Hackclub Say Cheese thing (https://saycheese.hackclub.com/) where you make a game/program that fits in a QR code.
 
+## note!
+It used to be cooler, but then I realized it had to be smaller than ~2200 bytes rather than ~3000 bytes, so I removed a lot of stuff. You can view the cool version here: [Commit b76b2aa](https://github.com/CalSch/c64-tiny/tree/b76b2aa11eb35eaa8d10a18d70eb173eca31ba5c)
+
 ## The QR Code
 ~~it will be here soon~~ It's here!  
-![qr](https://github.com/user-attachments/assets/be54cd46-e6c9-4fec-9330-21ca81c5c8f4)
+![qr](https://github.com/user-attachments/assets/9a101a11-110a-4929-9fbb-f46b9682a9e8)
+
 
 
 ## How to play
@@ -14,7 +18,7 @@ This is Tron for the Commodore 64 made for the Hackclub Say Cheese thing (https:
 ## Features
 - The game (duh)
 - Two players (no one player mode)
-- A main menu with a cool title
+- A main menu ~~with a cool title~~ (removed for size)
 - Score
 
 ## Resources
@@ -35,5 +39,6 @@ This is Tron for the Commodore 64 made for the Hackclub Say Cheese thing (https:
     - Run `make main` to do it step-by-step if you want
 - Run: `make run` (probably not how im supposed to do it, but it works) or use your own emulator
     - It normally runs `vice-jz.x64 -autostart main`
-- Generate qr code: `make qr.png`
+- Generate URI: `make uri`
+- Generate qr code: `make qr`
 - Run `make clean` to remove generated files

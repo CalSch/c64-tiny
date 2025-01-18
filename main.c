@@ -73,6 +73,7 @@ typedef struct Player {
 	// byte test; // unused maybe (for testing)
 	byte input[5]; // input queue
 	byte inputSize; // current input queue size
+	byte score;
 } Player;
 
 void playerAddInput(Player* p, byte d) {
@@ -98,8 +99,9 @@ void updatePlayer(Player* p) {
 	p->x += DIR2DX(p->d);
 	p->y += DIR2DY(p->d);
 	c = PEEK(0x400 + p->x + p->y*40); // test screen for what character is there
-	if (c != BG_CHAR) { // if the next position isnt blank, the player loses
+	if (c != BG_CHAR || p->x<0 || p->y<0 || p->x>=40 || p->y>=25) { // if the next position isnt blank, the player loses
 		gameState=p->id ? 1 : 2;
+		--p->score;
 		return;
 	}
 	printChar(p->x,p->y,p->c); // draw player
@@ -131,14 +133,14 @@ void resetGame() {
 void onMainMenu() {
 	int i;
 	clearScreen();
-	for (i=0;i<40-2;++i)
+	for (i=0;i<40-2;++i) {
+		printChar(i+1,8,0xa0);
 		printChar(i+1,1,0xa0);
+	}
 	printString(tronText1,0,3);
 	printString(tronText2,0,4);
 	printString(tronText3,0,5);
 	printString(tronText4,0,6);
-	for (i=0;i<40-2;++i)
-		printChar(i+1,8,0xa0);
 	// printString("tron!",1,1);
 	printString("press space to start",(40-20)/2,10);
 	printString("player 1",4,13);
@@ -195,10 +197,14 @@ void gameTick() {
 }
 
 void onLose() {
+	++p1.score;
+	++p2.score;
 	fillScreen(' ');
-	printString("game over!",1,1);
-	printString("player # won!",1,3);
+	printString("game over!",(40-10)/2,1);
+	printString("player # won! its now ### to ###",1,3);
 	printChar(8,3,gameState == 1 ? '1' : '2');
+	printDecimal(23,3,p1.score,3);
+	printDecimal(30,3,p2.score,3);
 
 	printString("press space to play again",1,6);
 
@@ -217,7 +223,7 @@ int main() {
 	resetGame();
 
 	while (1) {
-		wait(3000);
+		wait(2500);
 		// keyboard input
 		
 		if (gameState == 3) {

@@ -17,7 +17,7 @@ main: main.o
 	ld65 -o $(OUT_FILE) $(LD_FLAGS) main.o c64.lib
 	@stat -c "%s bytes" $(OUT_FILE)
 
-uri:
+uri: main
 	echo "data:application/octet-stream;base64,"$$(base64 main -w0) > uri.txt
 
 qr: uri

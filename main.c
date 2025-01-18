@@ -11,7 +11,7 @@ typedef unsigned char byte;
 
 #define BG_CHAR 0xe9
 
-int DIR2OPPOSITE[] = {2,3,0,1};
+byte DIR2OPPOSITE[] = {2,3,0,1};
 
 char tronText1[] = "#####  ###    ###   #  #     #  # ";
 char tronText2[] = "  #    #  #  #   #  ## #          ";

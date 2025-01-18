@@ -17,8 +17,11 @@ main: main.o
 	ld65 -o $(OUT_FILE) $(LD_FLAGS) main.o c64.lib
 	@stat -c "%s bytes" $(OUT_FILE)
 
-qr.png: $(OUT_FILE)
-	qrencode -o qr.png -r $(OUT_FILE) -8
+uri:
+	echo "data:application/octet-stream;base64,"$$(base64 main -w0) > uri.txt
+
+qr: uri
+	qrencode -o qr.png $$(cat uri.txt)
 
 run:
 	vice-jz.x64 -autostart $(OUT_FILE)
@@ -27,4 +30,5 @@ clean:
 	rm main
 	rm main.o
 	rm main.s
+	rm uri.txt
 	rm qr.png

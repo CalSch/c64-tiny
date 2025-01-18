@@ -1,5 +1,19 @@
-# c64-tiny
-This is a Commodore 64 program (not sure what it will be yet) for the Hackclub Say Cheese thing (https://saycheese.hackclub.com/)
+# c64-tiny (Tiny Tron!)
+This is Tron for the Commodore 64 made for the Hackclub Say Cheese thing (https://saycheese.hackclub.com/) where you make a game/program that fits in a QR code.
+
+## The QR Code
+it will be here soon
+
+## How to play
+1. Scan the QR code and put the data into a file
+2. Load that file as a disk into a Commodore 64 emulator
+3. Have fun
+
+## Features
+- The game (duh)
+- Two players (no one player mode)
+- A main menu with a cool title
+- Score
 
 ## Resources
 - New cc65 documentation (https://cc65.github.io/doc/)
@@ -15,6 +29,8 @@ This is a Commodore 64 program (not sure what it will be yet) for the Hackclub S
 
 ## Build and run
 - Build: `make` which compiles, assembles, and links it with `cl65`. This makes the `main` file which can be loaded into a c64 emulator
+    - Run `make main` to do it step-by-step if you want
 - Run: `make run` (probably not how im supposed to do it, but it works) or use your own emulator
     - It normally runs `vice-jz.x64 -autostart main`
 - Generate qr code: `make qr.png`
+- Run `make clean` to remove generated files

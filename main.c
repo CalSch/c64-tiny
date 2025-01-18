@@ -141,6 +141,10 @@ void onMainMenu() {
 		printChar(i+1,8,0xa0);
 	// printString("tron!",1,1);
 	printString("press space to start",(40-20)/2,10);
+	printString("player 1",4,13);
+	printString("player 2",40-8-4,13);
+	printString("w/a/s/d",4,14);
+	printString("i/j/k/l",40-8-4,14);
 	while (1) {
 		getKey();
 		if (key==' ') break;

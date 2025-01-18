@@ -1,6 +1,8 @@
 
-#define POKE(addr,value) *(unsigned char*) addr = value;
-#define PEEK(addr) (*(unsigned char*)(addr))
+typedef unsigned char byte;
+
+#define POKE(addr,value) *(byte*) addr = value;
+#define PEEK(addr) (*(byte*)(addr))
 
 // convert direction into change in x
 #define DIR2DX(dir) (dir&1 ? (dir==1 ? 1 : -1) : 0)
@@ -9,30 +11,35 @@
 
 #define BG_CHAR 0xe9
 
-int DIR2OPPOSITE[] = {2,3,0,1};
+// int DIR2OPPOSITE[] = {2,3,0,1};
 
-void printChar(int x,int y, char c) {
+char tronText1[] = "   #####  ###    ###   #  #     #  #    ";
+char tronText2[] = "     #    #  #  #   #  ## #             ";
+char tronText3[] = "     #    ###   #   #  # ##    #    #   ";
+char tronText4[] = "     #    #  #   ###   #  #     ####    ";
+
+void printChar(byte x, byte y, char c) {
 	int addr = 0x400 + x + y * 40;
 	POKE(addr,c);
 }
 
-void printBinary(int x,int y,int n,int bits) {
-	int i;
+void printBinary(byte x, byte y, int n, byte bits) {
+	byte i;
 	for (i=0;i<bits;++i) {
-		int value = (n>>i)&1;
+		byte value = (n>>i)&1;
 		printChar(x-i+bits-1,y,value?'1':'0');
 	}
 }
-void printDecimal(int x,int y,int n, int digits) {
-	int i;
+void printDecimal(byte x, byte y, int n, byte digits) {
+	byte i;
 	for (i=0;i<digits;++i) {
 		int value = n%10;
 		printChar(x-i+digits-1,y,'0'+value);
 		n/=10;
 	}
 }
-void printString(char* str,int x, int y) {
-	int i=0;
+void printString(char* str, byte x, byte y) {
+	byte i=0;
 	while (str[i] != 0) {
 		printChar(x+i,y,str[i]);
 		++i;
@@ -52,29 +59,29 @@ void wait(int n) {
 }
 
 
-int key;
-int gameState=3; // 0=playing, 1=player 1 won, 2=player 2 won, 3=main menu
+char key;
+byte gameState=3; // 0=playing, 1=player 1 won, 2=player 2 won, 3=main menu
 int gameTime=0;
 
 
 typedef struct Player {
-	int id;
-	int x;
-	int y;
-	int d; // direction, 0=up, 1=right, 2=down, 3=left
+	byte id;
+	byte x;
+	byte y;
+	byte d; // direction, 0=up, 1=right, 2=down, 3=left
 	char c; // player's onscreen character
-	int test; // unused maybe (for testing)
-	char input[10]; // input queue
-	int inputSize; // current input queue size
+	// byte test; // unused maybe (for testing)
+	byte input[5]; // input queue
+	byte inputSize; // current input queue size
 } Player;
 
-void playerAddInput(Player* p, int d) {
+void playerAddInput(Player* p, byte d) {
 	p->input[p->inputSize] = d;
 	++p->inputSize;
 }
 void playerProcessInput(Player* p) {
-	int d;
-	int i=0;
+	byte d;
+	byte i=0;
 	if (p->inputSize == 0) return;
 	d=p->input[p->inputSize-1]; // get direction
 	--p->inputSize;
@@ -122,9 +129,18 @@ void resetGame() {
 }
 
 void onMainMenu() {
+	int i;
 	clearScreen();
-	printString("tron!",1,1);
-	printString("press space to start",1,3);
+	for (i=0;i<40-2;++i)
+		printChar(i+1,1,0xa0);
+	printString(tronText1,0,3);
+	printString(tronText2,0,4);
+	printString(tronText3,0,5);
+	printString(tronText4,0,6);
+	for (i=0;i<40-2;++i)
+		printChar(i+1,8,0xa0);
+	// printString("tron!",1,1);
+	printString("press space to start",(40-20)/2,10);
 	while (1) {
 		getKey();
 		if (key==' ') break;

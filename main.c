@@ -13,10 +13,16 @@ typedef unsigned char byte;
 
 byte DIR2OPPOSITE[] = {2,3,0,1};
 
-char tronText1[] = "#####  ###    ###   #  #     #  # ";
-char tronText2[] = "  #    #  #  #   #  ## #          ";
-char tronText3[] = "  #    ###   #   #  # ##    #    #";
-char tronText4[] = "  #    #  #   ###   #  #     #### ";
+// Old title:
+// char tronText1[] = "#####  ###    ###   #  #     #  # ";
+// char tronText2[] = "  #    #  #  #   #  ## #          ";
+// char tronText3[] = "  #    ###   #   #  # ##    #    #";
+// char tronText4[] = "  #    #  #   ###   #  #     #### ";
+// New title
+char tronText1[] = "### # ##  # #  ### ##   #  ##   # ";
+char tronText2[] = " #  # # # # #   #  # # # # # #  # ";
+char tronText3[] = " #  # # #  #    #  ##  # # # #    ";
+char tronText4[] = " #  # # #  #    #  # #  #  # #  # ";
 
 void wait(int n) { // totally a good way to do it
 	while (n) --n;

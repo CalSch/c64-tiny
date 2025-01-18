@@ -27,3 +27,4 @@ clean:
 	rm main
 	rm main.o
 	rm main.s
+	rm qr.png
